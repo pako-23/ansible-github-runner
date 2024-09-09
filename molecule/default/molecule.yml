@@ -1,0 +1,27 @@
+---
+driver:
+  name: vagrant
+  provider:
+    name: libvirt
+    type: libvirt
+
+platforms:
+  - name: ubuntu22.04
+    box: generic/ubuntu2204
+    memory: 2048
+    cpus: 2
+    groups:
+      - github-runner
+
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      stdout_callback: yaml
+
+role_name_check: 1
+
+verifier:
+  name: testinfra
+  options:
+    s: true

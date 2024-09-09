@@ -1,0 +1,22 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: pako-23
+  description: A role to install Github self-hosted runner in Linux.
+
+  galaxy_tags:
+    - github
+    - runner
+    - actions
+
+  license: MIT
+  min_ansible_version: '1.16'
+  namespace: pako-23
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+
+  role_name: github_runner

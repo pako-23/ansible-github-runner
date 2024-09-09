@@ -1,0 +1,45 @@
+---
+- name: GitHub Runner | Install packages
+  ansible.builtin.apt:
+    install_recommends: false
+    name: tar
+
+- name: GitHub Runner | Create runner group
+  ansible.builtin.group:
+    name: runner
+
+- name: GitHub Runner | Create runner user
+  ansible.builtin.user:
+    name: runner
+    shell: /usr/sbin/nologin
+    create_home: false
+    system: true
+    group: runner
+
+- name: GitHub Runner | Add executables directory
+  ansible.builtin.file:
+    group: runner
+    mode: 0775
+    owner: root
+    path: /opt/actions-runner-linux-x64-{{ github_runner_version }}
+    state: directory
+
+- name: GitHub Runner | Check if GitHub Runner executables are available
+  ansible.builtin.stat:
+    path: /opt/actions-runner-linux-x64-{{ github_runner_version }}/bin
+  register: github_runner_executables
+
+- name: GitHub Runner | Download GitHub Runner executables
+  ansible.builtin.unarchive:
+    dest: /opt/actions-runner-linux-x64-{{ github_runner_version }}
+    group: root
+    owner: root
+    remote_src: true
+    src: https://github.com/actions/runner/releases/download/v{{ github_runner_version }}/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz
+  when: not github_runner_executables.stat.exists
+
+- name: GitHub Runner | Install dependencies
+  ansible.builtin.shell:
+    chdir: /opt/actions-runner-linux-x64-{{ github_runner_version }}
+    cmd: DEBIAN_FRONTEND=noninteractive ./bin/installdependencies.sh
+  when: not github_runner_executables.stat.exists

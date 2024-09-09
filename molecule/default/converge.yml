@@ -1,0 +1,12 @@
+---
+- name: Converge
+  hosts: github-runner
+  become: true
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        cache_valid_time: 600
+        update_cache: true
+
+  roles:
+    - role: pako-23.github_runner
