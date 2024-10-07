@@ -25,7 +25,7 @@
 - name: GitHub Runner | Add executables directory
   ansible.builtin.file:
     group: "{{ github_runner_group }}"
-    mode: 0775
+    mode: '0775'
     owner: "{{ github_runner_user }}"
     path: /opt/actions-runner-linux-x64-{{ github_runner_version }}
     state: directory
@@ -43,10 +43,4 @@
     owner: "{{ github_runner_user }}"
     remote_src: true
     src: https://github.com/actions/runner/releases/download/v{{ github_runner_version }}/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz
-  when: not github_runner_executables.stat.exists
-
-- name: GitHub Runner | Install dependencies
-  ansible.builtin.shell:
-    chdir: /opt/actions-runner-linux-x64-{{ github_runner_version }}
-    cmd: DEBIAN_FRONTEND=noninteractive ./bin/installdependencies.sh
   when: not github_runner_executables.stat.exists

@@ -1,7 +1,9 @@
 ---
-- ansible.builtin.import_tasks: installation.yml
+- name: GitHub Runner | Install GitHub Runner binaries
+  ansible.builtin.import_tasks: installation.yml
   tags: installation
 
-- ansible.builtin.import_tasks: configuration.yml
+- name: GitHub Runner | Configure and register a runner
+  ansible.builtin.import_tasks: configuration.yml
   tags: configuration
   when: github_runner_config | default(False)

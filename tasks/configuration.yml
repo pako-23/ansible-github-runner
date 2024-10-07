@@ -1,32 +1,28 @@
 ---
-- name: GitHub Runner | Check if runner is already configured
-  ansible.builtin.stat:
-    path: /opt/actions-runner-linux-x64-{{ github_runner_version }}/.runner
-  register: github_runner_configuration
-
-- name: GitHub Runner | Check if runner is already configured
-  ansible.builtin.stat:
-    path: /opt/actions-runner-linux-x64-{{ github_runner_version }}/.credentials
-  register: github_runner_credentials
-
 - name: GitHub Runner | Configure the runner
-  ansible.builtin.shell:
+  ansible.builtin.command:
     chdir: /opt/actions-runner-linux-x64-{{ github_runner_version }}
-    cmd: |-
-      su -c "./config.sh --url {{ github_runner_config.url }} \
-                  --token {{ github_runner_config.token }} \
-                  --name {{ ansible_facts["nodename"] }} \
-                  --work _work \
-                  --labels '{{ github_runner_config.labels | join(",") }}' \
-                  --runnergroup '{{ github_runner_config.pool | default("Default")}}'" {{ github_runner_user }}
+    argv:
+      - su
+      - -c
+      - ./config.sh {{ parameters | join(' ') }}
+      - "{{ github_runner_user }}"
+    creates: /opt/actions-runner-linux-x64-{{ github_runner_version }}/.credentials
+  vars:
+    parameters:
+      - --url {{ github_runner_config.url }}
+      - --token {{ github_runner_config.token }}
+      - --name {{ ansible_facts["nodename"] }}
+      - --work _work
+      - --labels '{{ github_runner_config.labels | join(",") }}'
+      - --runnergroup '{{ github_runner_config.pool | default("Default") }}'
   no_log: true
-  when: not (github_runner_configuration.stat.exists and github_runner_credentials.stat.exists)
 
 - name: GitHub Runner | Copy service exectuable
   ansible.builtin.copy:
     dest: /opt/actions-runner-linux-x64-{{ github_runner_version }}
     group: "{{ github_runner_group }}"
-    mode: 0755
+    mode: '0755'
     owner: "{{ github_runner_user }}"
     remote_src: true
     src: /opt/actions-runner-linux-x64-{{ github_runner_version }}/bin/runsvc.sh
@@ -36,15 +32,14 @@
     dest: /etc/systemd/system/github-runner.service
     owner: root
     group: root
-    mode: 0664
+    mode: '0664'
     src: github-runner.service.j2
-  notify: restart github-runner
+  notify: Restart Github Runner
   register: systemd_unit
 
 - name: GitHub Runner | Reload systemd configurations
   ansible.builtin.systemd:
     daemon_reload: true
-  when: systemd_unit.changed
 
 - name: GitHub Runner | Start github-runner service
   ansible.builtin.service:
