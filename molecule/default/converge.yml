@@ -1,6 +1,6 @@
 ---
 - name: Converge
-  hosts: github-runner
+  hosts: runner
   become: true
   pre_tasks:
     - name: Update apt cache

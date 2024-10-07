@@ -10,8 +10,7 @@ platforms:
     box: generic/ubuntu2204
     memory: 2048
     cpus: 2
-    groups:
-      - github-runner
+    groups: [runner]
 
 provisioner:
   name: ansible
@@ -25,3 +24,5 @@ verifier:
   name: testinfra
   options:
     s: true
+
+# ssh -i /home/pasquale/.cache/molecule/ansible-github-runner/default/.vagrant/machines/ubuntu22.04/libvirt/private_key -o IdentitiesOnly=yes -o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlgorithms=+ssh-rsa -o StrictHostKeyChecking=no -o PasswordAuthentication=no -o  UserKnownHostsFile=/dev/null vagrant@192.168.121.150
